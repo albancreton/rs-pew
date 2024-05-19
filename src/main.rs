@@ -1,24 +1,23 @@
 use std::io::Result;
 
 use crossterm::event;
-use rspew::background::Background;
 use rspew::renderer;
+use rspew::widgets::noise_background::NoiseBackground;
 
 fn main() -> Result<()> {
     // init
     let renderer = renderer::Renderer::new();
     let mut terminal = renderer.start().unwrap();
-    let seed: f64 = 100.0;
-    let mut background = Background::new(seed);
+    let seed: f64 = 102.0;
+    let mut background = NoiseBackground::new(seed);
 
     // game loop
     loop {
         // draw everything
         terminal.draw(|frame| {
             let area = frame.size();
-            let canvas = background.render(area);
 
-            frame.render_widget(canvas, area);
+            frame.render_widget(background, area);
         })?;
 
         // update animations

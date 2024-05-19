@@ -1,2 +1,2 @@
-pub mod background;
 pub mod renderer;
+pub mod widgets;
