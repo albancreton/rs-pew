@@ -24,7 +24,7 @@ fn main() -> Result<()> {
             color: Color::Gray,
         },
     );
-    let mut cave2 = Cave::new(
+    let mut cave_foreground = Cave::new(
         200.0,
         CaveConfig {
             opening_max: 1.0,
@@ -43,7 +43,7 @@ fn main() -> Result<()> {
 
             frame.render_widget(background, area);
             frame.render_widget(cave, area);
-            frame.render_widget(cave2, area);
+            frame.render_widget(cave_foreground, area);
             frame.render_widget(
                 Block::default()
                     .title("··· Scroll Speed: ← → ··· Quit: Esc / q ···")
@@ -58,7 +58,7 @@ fn main() -> Result<()> {
         // update animations
         background.scroll();
         cave.scroll();
-        cave2.scroll();
+        cave_foreground.scroll();
 
         // capture events
         if event::poll(std::time::Duration::from_millis(16))? {
@@ -69,17 +69,17 @@ fn main() -> Result<()> {
                 if key.code == event::KeyCode::Char(' ') {
                     background.set_speed_x(0);
                     cave.set_speed_x(0);
-                    cave2.set_speed_x(0);
+                    cave_foreground.set_speed_x(0);
                 }
                 if key.code == event::KeyCode::Left && background.speed_x > -10 {
                     background.set_speed_x(background.speed_x - 1);
                     cave.set_speed_x(cave.speed_x - 2);
-                    cave2.set_speed_x(cave2.speed_x - 3);
+                    cave_foreground.set_speed_x(cave_foreground.speed_x - 3);
                 }
                 if key.code == event::KeyCode::Right && background.speed_x < 10 {
                     background.set_speed_x(background.speed_x + 1);
                     cave.set_speed_x(cave.speed_x + 2);
-                    cave2.set_speed_x(cave2.speed_x + 3);
+                    cave_foreground.set_speed_x(cave_foreground.speed_x + 3);
                 }
             }
         }
