@@ -1,10 +1,10 @@
-use std::io::Result;
-
 use crossterm::event;
-use ratatui::style::Color;
+use ratatui::style::{Color, Style};
+use ratatui::widgets::{Block, BorderType, Borders};
 use rspew::renderer;
 use rspew::widgets::cave::{Cave, CaveConfig};
 use rspew::widgets::noise_background::NoiseBackground;
+use std::io::Result;
 
 fn main() -> Result<()> {
     // init
@@ -18,9 +18,9 @@ fn main() -> Result<()> {
         100.0,
         CaveConfig {
             opening_ratio: 1.0,
-            opening_min: 0.1,
-            frequency: 75.0,
-            smooth: 750.0,
+            opening_min: 0.6,
+            frequency: 50.0,
+            smooth: 25.0,
             color: Color::Gray,
         },
     );
@@ -28,9 +28,9 @@ fn main() -> Result<()> {
         200.0,
         CaveConfig {
             opening_ratio: 1.0,
-            opening_min: 0.8,
-            frequency: 100.0,
-            smooth: 20.0,
+            opening_min: 0.9,
+            frequency: 10.0,
+            smooth: 200.0,
             color: Color::DarkGray,
         },
     );
@@ -44,6 +44,15 @@ fn main() -> Result<()> {
             frame.render_widget(background, area);
             frame.render_widget(cave, area);
             frame.render_widget(cave2, area);
+            frame.render_widget(
+                Block::default()
+                    .title("··· Scroll Speed: ← → ··· Quit: Esc / q ···")
+                    .borders(Borders::ALL)
+                    .border_style(Style::default().fg(Color::White))
+                    .border_type(BorderType::Rounded)
+                    .style(Style::default().bg(Color::Black)),
+                area,
+            )
         })?;
 
         // update animations
@@ -54,8 +63,13 @@ fn main() -> Result<()> {
         // capture events
         if event::poll(std::time::Duration::from_millis(16))? {
             if let event::Event::Key(key) = event::read()? {
-                if key.code == event::KeyCode::Char('q') {
+                if key.code == event::KeyCode::Char('q') || key.code == event::KeyCode::Esc {
                     break;
+                }
+                if key.code == event::KeyCode::Char(' ') {
+                    background.set_speed_x(0);
+                    cave.set_speed_x(0);
+                    cave2.set_speed_x(0);
                 }
                 if key.code == event::KeyCode::Left && background.speed_x > -10 {
                     background.set_speed_x(background.speed_x - 1);

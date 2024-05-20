@@ -66,7 +66,7 @@ impl Widget for NoiseBackground {
                     color as f32 / 255.0,
                 )
                 .into_color();
-                hsl.lightness = hsl.lightness / 3.0;
+                hsl.lightness = hsl.lightness / 2.5;
                 let my_new_rgb = Srgb::from_color(hsl);
 
                 let fg = Color::Rgb(
