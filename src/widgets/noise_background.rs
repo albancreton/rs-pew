@@ -2,6 +2,8 @@ use palette::{FromColor, Hsl, IntoColor, Srgb};
 use perlin_rust::PerlinNoise;
 use ratatui::{buffer::Buffer, layout::Rect, style::Color, widgets::Widget};
 
+use crate::noise::Perlin;
+
 #[derive(Clone, Copy)]
 pub struct NoiseBackground {
     pub seed: f64,
@@ -45,10 +47,11 @@ impl NoiseBackground {
 impl Widget for NoiseBackground {
     #[allow(clippy::cast_precision_loss, clippy::similar_names)]
     fn render(self, area: Rect, buf: &mut Buffer) {
-        let perlin = PerlinNoise::new(self.seed);
+        let mut perlin = Perlin::new(self.seed, true);
+        perlin.set_interval(0.0, 255.0);
 
-        let noise_base_x = area.x as f64 + self.offset_x as f64 + 1.0E+9f64;
-        let noise_base_y = area.y as f64 + self.offset_y as f64 + 1.0E+9f64;
+        let noise_base_x = area.x as f64 + self.offset_x as f64;
+        let noise_base_y = area.y as f64 + self.offset_y as f64;
         let res_devider = (256 / self.resolution) as u8;
 
         for (_, y_pos) in (area.top()..area.bottom()).enumerate() {
@@ -56,9 +59,8 @@ impl Widget for NoiseBackground {
                 let x = x_pos as f64 + noise_base_x;
                 let y = y_pos as f64 + noise_base_y;
 
-                let noise = perlin.perlin2(x / 25.0, y / 25.0);
-                let normal_noise = (noise + 1.0) / 2.0 * 255.0;
-                let color = (normal_noise / (res_devider as f64)) as u8 * res_devider;
+                let noise = perlin.noise2d(x / 25.0, y / 25.0);
+                let color = (noise / (res_devider as f64)) as u8 * res_devider;
 
                 let mut hsl: Hsl = Srgb::new(
                     color as f32 / 255.0,
