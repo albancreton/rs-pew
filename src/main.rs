@@ -17,20 +17,20 @@ fn main() -> Result<()> {
     let mut cave = Cave::new(
         100.0,
         CaveConfig {
-            opening_ratio: 1.0,
-            opening_min: 0.6,
-            frequency: 50.0,
-            smooth: 25.0,
+            opening_max: 0.8,
+            opening_min: 0.7,
+            frequency: 100.0,
+            smooth: 50.0,
             color: Color::Gray,
         },
     );
     let mut cave2 = Cave::new(
         200.0,
         CaveConfig {
-            opening_ratio: 1.0,
+            opening_max: 1.0,
             opening_min: 0.9,
             frequency: 10.0,
-            smooth: 200.0,
+            smooth: 20.0,
             color: Color::DarkGray,
         },
     );

@@ -1,8 +1,9 @@
-use perlin_rust::PerlinNoise;
 use ratatui::{buffer::Buffer, layout::Rect, style::Color, widgets::Widget};
 
+use crate::noise::Perlin;
+
 pub struct CaveConfig {
-    pub opening_ratio: f64,
+    pub opening_max: f64,
     pub opening_min: f64,
     pub frequency: f64,
     pub smooth: f64,
@@ -31,7 +32,7 @@ impl Cave {
             offset_x: 0,
             speed_x: 0,
 
-            opening_ratio: config.opening_ratio,
+            opening_ratio: config.opening_max,
             opening_min: config.opening_min,
             frequency: config.frequency,
             smooth: config.smooth,
@@ -50,30 +51,25 @@ impl Cave {
 
 impl Widget for Cave {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        let noise_base_x = area.x as f64 + self.offset_x as f64 + 1.0E+9f64;
-        let perlin_top = PerlinNoise::new(self.seed);
-        let perlin_bot = PerlinNoise::new(self.seed + 25.0);
+        let noise_base_x = area.x as f64 + self.offset_x as f64;
 
-        let opening_ratio = self.opening_ratio;
-        let opening_min = self.opening_min;
+        let mut perlin_top = Perlin::new(self.seed, true);
+        perlin_top.set_interval(0.2, 0.8);
+
+        let mut perlin_bot = Perlin::new(self.seed + 25.0, true);
+        perlin_bot.set_interval(self.opening_min, self.opening_ratio);
+
         let frequency = self.frequency;
         let smooth = self.smooth;
 
         for (_, x_pos) in (area.left()..area.right()).enumerate() {
             let x = x_pos as f64 + noise_base_x;
 
-            let noise_center = perlin_top.perlin2(x / frequency, 0.0);
-            let noise_opening = perlin_bot.perlin2(x / smooth, 2.0);
+            let noise_center = perlin_top.noise2d(x / frequency, 0.0);
+            let noise_opening = perlin_bot.noise2d(x / smooth, 2.0);
 
-            let normal_noise_center = 0.1 + ((noise_center + 1.0) / 2.0) * 0.9;
-            let normal_noise_opening =
-                (1.0 - opening_ratio) / 2.0 + ((noise_opening + 1.0) / 2.0) * opening_ratio;
-
-            let center = area.height as f64 * normal_noise_center;
-            let mut opening = area.height as f64 * normal_noise_opening;
-            if opening < opening_min * area.height as f64 {
-                opening = opening_min * area.height as f64;
-            }
+            let center = area.height as f64 * noise_center;
+            let opening = area.height as f64 * noise_opening;
 
             let top = (center - (opening / 2.0)) as u16;
             let bot = (center + (opening / 2.0)) as u16;
