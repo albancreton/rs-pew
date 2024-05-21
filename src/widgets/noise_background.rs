@@ -1,5 +1,4 @@
 use palette::{FromColor, Hsl, IntoColor, Srgb};
-use perlin_rust::PerlinNoise;
 use ratatui::{buffer::Buffer, layout::Rect, style::Color, widgets::Widget};
 
 use crate::noise::Perlin;

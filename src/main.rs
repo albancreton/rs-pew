@@ -4,6 +4,7 @@ use ratatui::widgets::{Block, BorderType, Borders};
 use rspew::renderer;
 use rspew::widgets::cave::{Cave, CaveConfig};
 use rspew::widgets::noise_background::NoiseBackground;
+use rspew::widgets::spaceship::{self, SpaceshipWidget};
 use std::io::Result;
 
 fn main() -> Result<()> {
@@ -13,6 +14,8 @@ fn main() -> Result<()> {
     let seed: f64 = 102.0;
 
     let mut background = NoiseBackground::new(seed);
+
+    let mut spaceship = spaceship::SpaceshipModel::new(10, 10);
 
     let mut cave = Cave::new(
         100.0,
@@ -44,6 +47,7 @@ fn main() -> Result<()> {
             frame.render_widget(background, area);
             frame.render_widget(cave, area);
             frame.render_widget(cave_foreground, area);
+            frame.render_widget(SpaceshipWidget::new(&spaceship), area);
             frame.render_widget(
                 Block::default()
                     .title("··· Scroll Speed: ← → ··· Quit: Esc / q ···")
@@ -80,6 +84,13 @@ fn main() -> Result<()> {
                     background.set_speed_x(background.speed_x + 1);
                     cave.set_speed_x(cave.speed_x + 2);
                     cave_foreground.set_speed_x(cave_foreground.speed_x + 3);
+                }
+
+                if key.code == event::KeyCode::Up {
+                    spaceship.position.y -= 1;
+                }
+                if key.code == event::KeyCode::Down {
+                    spaceship.position.y += 1;
                 }
             }
         }
