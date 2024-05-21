@@ -1,8 +1,8 @@
 use crossterm::event;
 use ratatui::style::{Color, Style};
 use ratatui::widgets::{Block, BorderType, Borders};
+use rspew::entities::cave::{CaveConfig, CaveModel, CaveWidget};
 use rspew::renderer;
-use rspew::widgets::cave::{Cave, CaveConfig};
 use rspew::widgets::noise_background::NoiseBackground;
 use rspew::widgets::spaceship::{self, SpaceshipWidget};
 use std::io::Result;
@@ -16,8 +16,7 @@ fn main() -> Result<()> {
     let mut background = NoiseBackground::new(seed);
 
     let mut spaceship = spaceship::SpaceshipModel::new(10, 10);
-
-    let mut cave = Cave::new(
+    let mut cave = CaveModel::new(
         100.0,
         CaveConfig {
             opening_max: 0.8,
@@ -27,7 +26,7 @@ fn main() -> Result<()> {
             color: Color::Gray,
         },
     );
-    let mut cave_foreground = Cave::new(
+    let mut cave_foreground = CaveModel::new(
         200.0,
         CaveConfig {
             opening_max: 1.0,
@@ -40,27 +39,9 @@ fn main() -> Result<()> {
 
     // game loop
     loop {
-        // draw everything
-        terminal.draw(|frame| {
-            let area = frame.size();
-
-            frame.render_widget(background, area);
-            frame.render_widget(cave, area);
-            frame.render_widget(cave_foreground, area);
-            frame.render_widget(SpaceshipWidget::new(&spaceship), area);
-            frame.render_widget(
-                Block::default()
-                    .title("··· Scroll Speed: ← → ··· Quit: Esc / q ···")
-                    .borders(Borders::ALL)
-                    .border_style(Style::default().fg(Color::White))
-                    .border_type(BorderType::Rounded)
-                    .style(Style::default().bg(Color::Black)),
-                area,
-            )
-        })?;
-
         // update animations
         background.scroll();
+
         cave.scroll();
         cave_foreground.scroll();
 
@@ -72,18 +53,18 @@ fn main() -> Result<()> {
                 }
                 if key.code == event::KeyCode::Char(' ') {
                     background.set_speed_x(0);
-                    cave.set_speed_x(0);
-                    cave_foreground.set_speed_x(0);
+                    cave.set_speed(0);
+                    cave_foreground.set_speed(0);
                 }
                 if key.code == event::KeyCode::Left && background.speed_x > -10 {
                     background.set_speed_x(background.speed_x - 1);
-                    cave.set_speed_x(cave.speed_x - 2);
-                    cave_foreground.set_speed_x(cave_foreground.speed_x - 3);
+                    cave.inc_speed(-2);
+                    cave_foreground.inc_speed(-3);
                 }
                 if key.code == event::KeyCode::Right && background.speed_x < 10 {
                     background.set_speed_x(background.speed_x + 1);
-                    cave.set_speed_x(cave.speed_x + 2);
-                    cave_foreground.set_speed_x(cave_foreground.speed_x + 3);
+                    cave.inc_speed(2);
+                    cave_foreground.inc_speed(3);
                 }
 
                 if key.code == event::KeyCode::Up {
@@ -94,6 +75,24 @@ fn main() -> Result<()> {
                 }
             }
         }
+        // draw everything
+        terminal.draw(|frame| {
+            let area = frame.size();
+
+            frame.render_widget(background, area);
+            frame.render_widget(CaveWidget::new(&cave), area);
+            frame.render_widget(CaveWidget::new(&cave_foreground), area);
+            frame.render_widget(SpaceshipWidget::new(&spaceship), area);
+            frame.render_widget(
+                Block::default()
+                    .title("··· Scroll Speed: ← → ··· Quit: Esc / q ···")
+                    .borders(Borders::ALL)
+                    .border_style(Style::default().fg(Color::White))
+                    .border_type(BorderType::Rounded)
+                    .style(Style::default().bg(Color::Black)),
+                area,
+            )
+        })?;
     }
 
     // post loop cleanup
