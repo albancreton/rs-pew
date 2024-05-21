@@ -67,7 +67,7 @@ impl Widget for NoiseBackground {
                     color as f32 / 255.0,
                 )
                 .into_color();
-                hsl.lightness = hsl.lightness / 2.5;
+                hsl.lightness /= 2.5;
                 let my_new_rgb = Srgb::from_color(hsl);
 
                 let fg = Color::Rgb(
@@ -76,7 +76,7 @@ impl Widget for NoiseBackground {
                     (my_new_rgb.blue * 255.0) as u8,
                 );
 
-                buf.get_mut(x_pos as u16, y_pos as u16)
+                buf.get_mut(x_pos, y_pos)
                     .set_char('▓')
                     .set_fg(fg)
                     .set_bg(Color::Black);

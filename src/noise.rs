@@ -18,8 +18,8 @@ impl Perlin {
         Self {
             output_min: -1.0,
             output_max: 1.0,
-            x_offset: x_offset,
-            y_offset: y_offset,
+            x_offset,
+            y_offset,
             perlin: PerlinNoise::new(seed),
         }
     }

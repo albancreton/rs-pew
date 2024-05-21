@@ -27,7 +27,7 @@ pub struct Cave {
 impl Cave {
     pub fn new(seed: f64, config: CaveConfig) -> Self {
         Self {
-            seed: seed,
+            seed,
 
             offset_x: 0,
             speed_x: 0,
@@ -89,7 +89,7 @@ impl Widget for Cave {
             */
             for (_, y_pos) in (area.top()..area.bottom()).enumerate() {
                 if y_pos < top || y_pos > bot {
-                    buf.get_mut(x_pos as u16, y_pos as u16)
+                    buf.get_mut(x_pos, y_pos)
                         .set_char('█')
                         .set_fg(self.color);
                 }
