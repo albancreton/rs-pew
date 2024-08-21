@@ -1,11 +1,13 @@
 use crossterm::event;
+use ratatui::prelude::CrosstermBackend;
 use ratatui::style::{Color, Style};
 use ratatui::widgets::{Block, BorderType, Borders};
+use ratatui::Terminal;
 use rspew::renderer;
 use rspew::widgets::cave::{Cave, CaveConfig};
 use rspew::widgets::noise_background::NoiseBackground;
 use rspew::widgets::spaceship::{self, SpaceshipWidget};
-use std::io::Result;
+use std::io::{Result, Stdout};
 
 fn main() -> Result<()> {
     // init
@@ -39,14 +41,33 @@ fn main() -> Result<()> {
     );
 
     // game loop
+    gameloop(
+        &mut terminal,
+        &mut spaceship,
+        &mut background,
+        &mut cave,
+        &mut cave_foreground,
+    )?;
+
+    // post loop cleanup
+    renderer.cleanup()
+}
+
+fn gameloop(
+    terminal: &mut Terminal<CrosstermBackend<Stdout>>,
+    spaceship: &mut spaceship::SpaceshipModel,
+    background: &mut NoiseBackground,
+    cave: &mut Cave,
+    cave_foreground: &mut Cave,
+) -> Result<()> {
     loop {
         // draw everything
         terminal.draw(|frame| {
             let area = frame.size();
 
-            frame.render_widget(background, area);
-            frame.render_widget(cave, area);
-            frame.render_widget(cave_foreground, area);
+            frame.render_widget(*background, area);
+            frame.render_widget(*cave, area);
+            frame.render_widget(*cave_foreground, area);
             frame.render_widget(SpaceshipWidget::new(&spaceship), area);
             frame.render_widget(
                 Block::default()
@@ -96,6 +117,5 @@ fn main() -> Result<()> {
         }
     }
 
-    // post loop cleanup
-    renderer.cleanup()
+    return Result::Ok(());
 }
