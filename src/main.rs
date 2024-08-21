@@ -78,7 +78,13 @@ fn gameloop(
                 area,
             );
 
-            frame.render_widget(SpaceshipWidget::new(&spaceship), area);
+            let color = if cave.has_pixel(spaceship.position.x, spaceship.position.y) {
+                Color::Red
+            } else {
+                Color::White
+            };
+            frame.render_widget(SpaceshipWidget::new(&spaceship, color), area);
+
             frame.render_widget(
                 Block::default()
                     .title("··· Scroll Speed: ← → ··· Quit: Esc / q ···")

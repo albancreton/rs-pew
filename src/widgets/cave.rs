@@ -51,6 +51,10 @@ impl Cave {
         self.speed_x = speed;
     }
 
+    pub fn has_pixel(&self, x: u16, y: u16) -> bool {
+        find(&(self.pixels), x, y)
+    }
+
     fn calculate_pixels(&mut self, area: Rect) {
         self.pixels = Vec::new();
         let noise_base_x = area.x as f64 + self.offset_x as f64;
