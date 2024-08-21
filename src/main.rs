@@ -4,7 +4,7 @@ use ratatui::style::{Color, Style};
 use ratatui::widgets::{Block, BorderType, Borders};
 use ratatui::Terminal;
 use rspew::renderer;
-use rspew::widgets::cave::{Cave, CaveConfig};
+use rspew::widgets::cave::{Cave, CaveConfig, CaveWidget};
 use rspew::widgets::noise_background::NoiseBackground;
 use rspew::widgets::spaceship::{self, SpaceshipWidget};
 use std::io::{Result, Stdout};
@@ -65,9 +65,19 @@ fn gameloop(
         terminal.draw(|frame| {
             let area = frame.size();
 
+            // update animations
+            background.scroll();
             frame.render_widget(*background, area);
-            frame.render_widget(*cave, area);
-            frame.render_widget(*cave_foreground, area);
+
+            cave.scroll(area);
+            frame.render_widget(CaveWidget::new(cave.color, &cave.pixels), area);
+
+            cave_foreground.scroll(area);
+            frame.render_widget(
+                CaveWidget::new(cave_foreground.color, &cave_foreground.pixels),
+                area,
+            );
+
             frame.render_widget(SpaceshipWidget::new(&spaceship), area);
             frame.render_widget(
                 Block::default()
@@ -79,11 +89,6 @@ fn gameloop(
                 area,
             )
         })?;
-
-        // update animations
-        background.scroll();
-        cave.scroll();
-        cave_foreground.scroll();
 
         // capture events
         if event::poll(std::time::Duration::from_millis(16))? {

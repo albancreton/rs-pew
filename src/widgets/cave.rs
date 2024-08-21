@@ -10,7 +10,7 @@ pub struct CaveConfig {
     pub color: Color,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct Cave {
     pub seed: f64,
     pub offset_x: i64,
@@ -21,7 +21,8 @@ pub struct Cave {
     frequency: f64,
     smooth: f64,
 
-    color: Color,
+    pub color: Color,
+    pub pixels: Vec<(u16, u16)>,
 }
 
 impl Cave {
@@ -38,19 +39,20 @@ impl Cave {
             smooth: config.smooth,
 
             color: config.color,
+            pixels: vec![],
         }
     }
-    pub fn scroll(&mut self) {
+    pub fn scroll(&mut self, area: Rect) {
         self.offset_x += self.speed_x;
+        self.calculate_pixels(area);
     }
 
     pub fn set_speed_x(&mut self, speed: i64) {
         self.speed_x = speed;
     }
-}
 
-impl Widget for Cave {
-    fn render(self, area: Rect, buf: &mut Buffer) {
+    fn calculate_pixels(&mut self, area: Rect) {
+        self.pixels = Vec::new();
         let noise_base_x = area.x as f64 + self.offset_x as f64;
 
         let mut perlin_top = Perlin::new(self.seed, true);
@@ -89,11 +91,46 @@ impl Widget for Cave {
             */
             for (_, y_pos) in (area.top()..area.bottom()).enumerate() {
                 if y_pos < top || y_pos > bot {
-                    buf.get_mut(x_pos, y_pos)
-                        .set_char('█')
-                        .set_fg(self.color);
+                    self.pixels.push((x_pos, y_pos));
                 }
             }
         }
     }
+}
+
+pub struct CaveWidget<'a> {
+    color: Color,
+    pixels: &'a Vec<(u16, u16)>,
+}
+impl<'a> CaveWidget<'a> {
+    pub fn new(color: Color, pixels: &'a Vec<(u16, u16)>) -> Self {
+        Self { color, pixels }
+    }
+}
+impl Widget for CaveWidget<'_> {
+    fn render(self, area: Rect, buf: &mut Buffer) {
+        // for (x_pos, y_pos) in self.pixels.iter() {
+        //     let x: u16 = *x_pos;
+        //     let y: u16 = *y_pos;
+        //     if x < area.height - 1 && y < area.width - 1 {
+        //         buf.get_mut(x, y).set_char('█').set_fg(self.color);
+        //     }
+        // }
+        for (_, y_pos) in (area.top()..area.bottom()).enumerate() {
+            for (_, x_pos) in (area.left()..area.right()).enumerate() {
+                if find(self.pixels, x_pos, y_pos) {
+                    buf.get_mut(x_pos, y_pos).set_char('█').set_fg(self.color);
+                }
+            }
+        }
+    }
+}
+
+fn find(v: &Vec<(u16, u16)>, x: u16, y: u16) -> bool {
+    for (x_pos, y_pos) in v.iter() {
+        if *x_pos == x && *y_pos == y {
+            return true;
+        }
+    }
+    return false;
 }
