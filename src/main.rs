@@ -22,21 +22,21 @@ fn main() -> Result<()> {
     let mut cave = Cave::new(
         100.0,
         CaveConfig {
-            opening_max: 0.4,
-            opening_min: 0.1,
-            frequency: 75.0,
-            smooth: 150.0,
-            color: Color::Gray,
+            opening_max: 0.6,
+            opening_min: 0.2,
+            frequency: 40.0,
+            smooth: 500.0,
+            color: Color::Rgb(220, 240, 244),
         },
     );
     let mut cave_foreground = Cave::new(
         200.0,
         CaveConfig {
             opening_max: 1.0,
-            opening_min: 0.9,
+            opening_min: 0.4,
             frequency: 10.0,
             smooth: 20.0,
-            color: Color::DarkGray,
+            color: Color::Rgb(180, 180, 190),
         },
     );
 

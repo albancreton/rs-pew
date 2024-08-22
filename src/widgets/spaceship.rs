@@ -44,7 +44,8 @@ impl SpaceshipWidget<'_> {
 impl Widget for SpaceshipWidget<'_> {
     fn render(self, _area: ratatui::layout::Rect, buf: &mut ratatui::buffer::Buffer) {
         buf.get_mut(self.model.position.x, self.model.position.y)
-            .set_char('►')
+            .set_char('▶')
+            .set_bg(Color::DarkGray)
             .set_fg(self.color);
     }
 }
