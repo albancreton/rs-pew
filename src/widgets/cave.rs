@@ -23,6 +23,7 @@ pub struct Cave {
 
     pub color: Color,
     pub pixels: Vec<(u16, u16)>,
+    pub openings: Vec<(u16, u16)>,
 }
 
 impl Cave {
@@ -40,6 +41,7 @@ impl Cave {
 
             color: config.color,
             pixels: vec![],
+            openings: vec![],
         }
     }
     pub fn scroll(&mut self, area: Rect) {
@@ -57,6 +59,8 @@ impl Cave {
 
     fn calculate_pixels(&mut self, area: Rect) {
         self.pixels = Vec::new();
+        self.openings = Vec::new();
+
         let noise_base_x = area.x as f64 + self.offset_x as f64;
 
         let mut perlin_top = Perlin::new(self.seed, true);
@@ -79,6 +83,7 @@ impl Cave {
 
             let top = (center - (opening / 2.0)) as u16;
             let bot = (center + (opening / 2.0)) as u16;
+            self.openings.push((top, bot));
 
             /*
             -

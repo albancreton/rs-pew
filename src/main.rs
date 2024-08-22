@@ -22,10 +22,10 @@ fn main() -> Result<()> {
     let mut cave = Cave::new(
         100.0,
         CaveConfig {
-            opening_max: 0.8,
+            opening_max: 0.4,
             opening_min: 0.1,
-            frequency: 50.0,
-            smooth: 75.0,
+            frequency: 75.0,
+            smooth: 150.0,
             color: Color::Gray,
         },
     );
@@ -60,7 +60,8 @@ fn gameloop(
     cave: &mut Cave,
     cave_foreground: &mut Cave,
 ) -> Result<()> {
-    let score: &mut i32 = &mut 1000;
+    let energy: &mut i32 = &mut 100;
+    let is_coliding_cave: &mut bool = &mut false;
 
     loop {
         // draw everything
@@ -80,17 +81,39 @@ fn gameloop(
                 area,
             );
 
-            let color = if cave.has_pixel(spaceship.position.x, spaceship.position.y) {
-                *score = *score - 1 as i32;
+            *is_coliding_cave = spaceship.check_collision(cave);
+            if *is_coliding_cave == true {
+                *energy = *energy - 1 as i32;
+                let opening = cave.openings[spaceship.position.x as usize];
+                if spaceship.position.y < opening.0 {
+                    spaceship.position.y += 1;
+                } else {
+                    spaceship.position.y -= 1;
+                }
+            }
+
+            let color = if *is_coliding_cave {
                 Color::Red
             } else {
                 Color::White
             };
             frame.render_widget(SpaceshipWidget::new(&spaceship, color), area);
 
+            let divider = 50.0;
+            let mut s = String::from("");
+            let r: usize = (*energy as f64 / (100.0 / divider)).floor() as usize;
+            let d = divider as usize - r;
+
+            for _ in 0..r {
+                s.push_str("█");
+            }
+            for _ in 0..d {
+                s.push_str("░");
+            }
+
             frame.render_widget(
                 Block::default()
-                    .title(format!("life: {}", score))
+                    .title(format!("{} {}", s, energy))
                     .title_bottom("··· Scroll Speed: ← → ··· Quit: Esc / q ···")
                     .borders(Borders::ALL)
                     .border_style(Style::default().fg(Color::White))
@@ -101,7 +124,7 @@ fn gameloop(
         })?;
 
         // capture events
-        if event::poll(std::time::Duration::from_millis(16))? {
+        if event::poll(std::time::Duration::from_millis(8))? {
             if let event::Event::Key(key) = event::read()? {
                 if key.code == event::KeyCode::Char('q') || key.code == event::KeyCode::Esc {
                     break;
@@ -122,10 +145,10 @@ fn gameloop(
                     cave_foreground.set_speed_x(cave_foreground.speed_x + 2);
                 }
 
-                if key.code == event::KeyCode::Up {
+                if key.code == event::KeyCode::Up && *is_coliding_cave == false {
                     spaceship.position.y -= 1;
                 }
-                if key.code == event::KeyCode::Down {
+                if key.code == event::KeyCode::Down && *is_coliding_cave == false {
                     spaceship.position.y += 1;
                 }
             }

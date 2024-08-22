@@ -76,6 +76,7 @@ impl Widget for NoiseBackground {
                     (my_new_rgb.blue * 255.0) as u8,
                 );
 
+                // https://symbl.cc/en/unicode-table/#box-drawing
                 buf.get_mut(x_pos, y_pos)
                     .set_char('▓')
                     .set_fg(fg)

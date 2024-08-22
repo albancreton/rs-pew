@@ -1,6 +1,8 @@
 use ratatui::style::Color;
 use ratatui::widgets::Widget;
 
+use super::cave::Cave;
+
 pub struct Point {
     pub x: u16,
     pub y: u16,
@@ -21,6 +23,10 @@ impl SpaceshipModel {
         SpaceshipModel {
             position: Point::new(x, y),
         }
+    }
+
+    pub fn check_collision(&self, cave: &Cave) -> bool {
+        cave.has_pixel(self.position.x, self.position.y)
     }
 }
 
