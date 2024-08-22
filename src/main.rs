@@ -15,17 +15,17 @@ fn main() -> Result<()> {
     let mut terminal = renderer.start().unwrap();
     let seed: f64 = 102.0;
 
-    let mut background = NoiseBackground::new(seed);
-
     let mut spaceship = spaceship::SpaceshipModel::new(10, 10);
+
+    let mut background = NoiseBackground::new(seed);
 
     let mut cave = Cave::new(
         100.0,
         CaveConfig {
             opening_max: 0.8,
-            opening_min: 0.7,
-            frequency: 100.0,
-            smooth: 50.0,
+            opening_min: 0.1,
+            frequency: 50.0,
+            smooth: 75.0,
             color: Color::Gray,
         },
     );
@@ -60,6 +60,8 @@ fn gameloop(
     cave: &mut Cave,
     cave_foreground: &mut Cave,
 ) -> Result<()> {
+    let score: &mut i32 = &mut 1000;
+
     loop {
         // draw everything
         terminal.draw(|frame| {
@@ -79,6 +81,7 @@ fn gameloop(
             );
 
             let color = if cave.has_pixel(spaceship.position.x, spaceship.position.y) {
+                *score = *score - 1 as i32;
                 Color::Red
             } else {
                 Color::White
@@ -87,7 +90,8 @@ fn gameloop(
 
             frame.render_widget(
                 Block::default()
-                    .title("··· Scroll Speed: ← → ··· Quit: Esc / q ···")
+                    .title(format!("life: {}", score))
+                    .title_bottom("··· Scroll Speed: ← → ··· Quit: Esc / q ···")
                     .borders(Borders::ALL)
                     .border_style(Style::default().fg(Color::White))
                     .border_type(BorderType::Rounded)
@@ -103,19 +107,19 @@ fn gameloop(
                     break;
                 }
                 if key.code == event::KeyCode::Char(' ') {
-                    background.set_speed_x(0);
+                    background.set_speed_x(0.0);
                     cave.set_speed_x(0);
                     cave_foreground.set_speed_x(0);
                 }
-                if key.code == event::KeyCode::Left && background.speed_x > -10 {
-                    background.set_speed_x(background.speed_x - 1);
-                    cave.set_speed_x(cave.speed_x - 2);
-                    cave_foreground.set_speed_x(cave_foreground.speed_x - 3);
+                if key.code == event::KeyCode::Left && background.speed_x > -10.0 {
+                    background.set_speed_x(background.speed_x - 0.5);
+                    cave.set_speed_x(cave.speed_x - 1);
+                    cave_foreground.set_speed_x(cave_foreground.speed_x - 2);
                 }
-                if key.code == event::KeyCode::Right && background.speed_x < 10 {
-                    background.set_speed_x(background.speed_x + 1);
-                    cave.set_speed_x(cave.speed_x + 2);
-                    cave_foreground.set_speed_x(cave_foreground.speed_x + 3);
+                if key.code == event::KeyCode::Right && background.speed_x < 10.0 {
+                    background.set_speed_x(background.speed_x + 0.5);
+                    cave.set_speed_x(cave.speed_x + 1);
+                    cave_foreground.set_speed_x(cave_foreground.speed_x + 2);
                 }
 
                 if key.code == event::KeyCode::Up {

@@ -6,10 +6,10 @@ use crate::noise::Perlin;
 #[derive(Clone, Copy)]
 pub struct NoiseBackground {
     pub seed: f64,
-    pub offset_x: i64,
-    pub offset_y: i64,
-    pub speed_x: i64,
-    pub speed_y: i64,
+    pub offset_x: f64,
+    pub offset_y: f64,
+    pub speed_x: f64,
+    pub speed_y: f64,
     pub resolution: i64,
 }
 
@@ -17,10 +17,10 @@ impl NoiseBackground {
     pub fn new(seed: f64) -> Self {
         Self {
             seed,
-            offset_x: 0,
-            offset_y: 0,
-            speed_x: 0,
-            speed_y: 0,
+            offset_x: 0.0,
+            offset_y: 0.0,
+            speed_x: 0.0,
+            speed_y: 0.0,
             resolution: 16,
         }
     }
@@ -30,14 +30,14 @@ impl NoiseBackground {
         self.offset_y += self.speed_y;
     }
 
-    pub fn set_speed_x(&mut self, speed: i64) {
+    pub fn set_speed_x(&mut self, speed: f64) {
         self.speed_x = speed;
     }
-    pub fn set_speed_y(&mut self, speed: i64) {
+    pub fn set_speed_y(&mut self, speed: f64) {
         self.speed_y = speed;
     }
 
-    pub fn set_speed(&mut self, speedx: i64, speedy: i64) {
+    pub fn set_speed(&mut self, speedx: f64, speedy: f64) {
         self.speed_x = speedx;
         self.speed_y = speedy;
     }
@@ -49,8 +49,8 @@ impl Widget for NoiseBackground {
         let mut perlin = Perlin::new(self.seed, true);
         perlin.set_interval(0.0, 255.0);
 
-        let noise_base_x = area.x as f64 + self.offset_x as f64;
-        let noise_base_y = area.y as f64 + self.offset_y as f64;
+        let noise_base_x = area.x as f64 + self.offset_x.floor() as f64;
+        let noise_base_y = area.y as f64 + self.offset_y.floor() as f64;
         let res_devider = (256 / self.resolution) as u8;
 
         for (_, y_pos) in (area.top()..area.bottom()).enumerate() {
