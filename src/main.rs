@@ -15,8 +15,6 @@ fn main() -> Result<()> {
     let mut terminal = renderer.start().unwrap();
     let seed: f64 = 102.0;
 
-    let mut spaceship = spaceship::SpaceshipModel::new(10, 10);
-
     let mut background = NoiseBackground::new(seed);
 
     let mut cave = CaveModel::new(
@@ -39,6 +37,14 @@ fn main() -> Result<()> {
             color: Color::Rgb(180, 180, 190),
         },
     );
+
+    // let's get the area of the terminal and generate the cave
+    let area = terminal.get_frame().size();
+    cave.scroll(area);
+
+    // place the spaceship in the middle of the cave
+    let mut spaceship =
+        spaceship::SpaceshipModel::new(10, cave.openings[10].1 - cave.openings[10].0);
 
     // game loop
     gameloop(
