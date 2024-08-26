@@ -1,6 +1,5 @@
-use ratatui::{buffer::Buffer, layout::Rect, style::Color, widgets::Widget};
-
 use crate::noise::Perlin;
+use ratatui::{buffer::Buffer, layout::Rect, style::Color, widgets::Widget};
 
 pub struct CaveConfig {
     pub opening_max: f64,
@@ -56,11 +55,16 @@ impl CaveModel {
 
         let noise_base_x = area.x as f64 + self.offset_x as f64;
 
-        let mut perlin_top = Perlin::new(self.seed, true);
-        perlin_top.set_interval(0.2, 0.8);
+        let mut perlin_center = Perlin::new(self.seed, true);
+        perlin_center.set_interval(0.2, 0.8);
 
-        let mut perlin_bot = Perlin::new(self.seed + 25.0, true);
-        perlin_bot.set_interval(self.opening_min, self.opening_ratio);
+        let mut perlin_opening = Perlin::new(self.seed + 25.0, true);
+        perlin_opening.set_interval(self.opening_min, self.opening_ratio);
+
+        let mut perlin_t = Perlin::new(self.seed + 30.0, true);
+        perlin_t.set_interval(-1.0, 1.0);
+        let mut perlin_b = Perlin::new(self.seed + 40.0, true);
+        perlin_b.set_interval(-1.0, 1.0);
 
         let frequency = self.frequency;
         let smooth = self.smooth;
@@ -68,11 +72,15 @@ impl CaveModel {
         for (_, x_pos) in (area.left()..area.right()).enumerate() {
             let x = x_pos as f64 + noise_base_x;
 
-            let noise_center = perlin_top.noise2d(x / frequency, 0.0);
-            let noise_opening = perlin_bot.noise2d(x / smooth, 2.0);
+            let noise_center = perlin_center.noise2d(x / frequency, 0.0);
+            let noise_opening = perlin_opening.noise2d(x / smooth, 2.0);
+            let noise_t = perlin_t.noise2d(x / smooth, 3.0) * 10.0;
+            let noise_b = perlin_b.noise2d(x / smooth, 4.0) * 10.0;
 
             let center = area.height as f64 * noise_center;
             let opening = area.height as f64 * noise_opening;
+            let t = noise_t as u16;
+            let b = noise_b as u16;
 
             /*
             -
@@ -89,7 +97,7 @@ impl CaveModel {
             */
             let top = (center - (opening / 2.0)) as u16;
             let bot = (center + (opening / 2.0)) as u16;
-            self.openings.push((top, bot));
+            self.openings.push((top + t, bot - b));
         }
     }
 }
