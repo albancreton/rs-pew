@@ -113,7 +113,7 @@ fn gameloop(
 
             frame.render_widget(
                 Block::default()
-                    .title(format!("{} {}", s, energy))
+                    .title(format!("   {}   ", s))
                     .title_bottom("··· Scroll Speed: ← → ··· Quit: Esc / q ···")
                     .borders(Borders::ALL)
                     .border_style(Style::default().fg(Color::White))
