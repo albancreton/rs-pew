@@ -11,3 +11,4 @@ $ git clone https://github.com/albancreton/rs-pew
 $ cd rs-pew
 $ cargo run
 ```
+![rs-pew](./rs-pew.gif "rs-pew")
