@@ -1,6 +1,6 @@
 # RS Pew
 
-A quick terminal demo, build with rust, that might or might not become a game.
+A quick terminal demo, built with rust, that seems to be becoming a game...
 
 ## Quick Start
 
@@ -11,4 +11,4 @@ $ git clone https://github.com/albancreton/rs-pew
 $ cd rs-pew
 $ cargo run
 ```
-![rs-pew](./rs-pew.gif "rs-pew")
+![rs-pew](./rs-pew2.gif "rs-pew")
