@@ -22,8 +22,8 @@ fn main() -> Result<()> {
         CaveConfig {
             opening_max: 0.6,
             opening_min: 0.2,
-            frequency: 40.0,
-            smooth: 500.0,
+            frequency: 30.0,
+            smooth: 200.0,
             color: Color::Rgb(220, 240, 244),
         },
     );
@@ -31,9 +31,9 @@ fn main() -> Result<()> {
         200.0,
         CaveConfig {
             opening_max: 1.0,
-            opening_min: 0.4,
+            opening_min: 0.5,
             frequency: 10.0,
-            smooth: 20.0,
+            smooth: 10.0,
             color: Color::Rgb(180, 180, 190),
         },
     );
@@ -74,7 +74,6 @@ fn gameloop(
         terminal.draw(|frame| {
             let area = frame.size();
 
-            // update animations
             background.scroll();
             frame.render_widget(*background, area);
 
