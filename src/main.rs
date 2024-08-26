@@ -85,7 +85,7 @@ fn gameloop(
             if *is_coliding_cave == true {
                 *energy = *energy - 1 as i32;
                 let opening = cave.openings[spaceship.position.x as usize];
-                if spaceship.position.y < opening.0 {
+                if spaceship.position.y <= opening.0 {
                     spaceship.position.y += 1;
                 } else {
                     spaceship.position.y -= 1;

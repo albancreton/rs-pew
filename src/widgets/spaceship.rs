@@ -28,7 +28,7 @@ impl SpaceshipModel {
     pub fn check_collision(&self, cave: &CaveModel) -> bool {
         let (top, bot) = cave.openings[self.position.x as usize];
 
-        self.position.y < top || self.position.y > bot
+        self.position.y <= top || self.position.y >= bot
     }
 }
 
