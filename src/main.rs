@@ -1,6 +1,6 @@
 use crossterm::event;
 use ratatui::prelude::CrosstermBackend;
-use ratatui::style::{Color, Style};
+use ratatui::style::{Color, Style, Stylize};
 use ratatui::widgets::{Block, BorderType, Borders};
 use ratatui::Terminal;
 use rspew::renderer;
@@ -86,42 +86,42 @@ fn gameloop(
                 area,
             );
 
+            let mut color = Color::White;
             *is_coliding_cave = spaceship.check_collision(cave);
             if *is_coliding_cave == true {
                 *energy = *energy - 1 as i32;
+                color = Color::Red;
+            }
+            frame.render_widget(SpaceshipWidget::new(&spaceship, color), area);
+
+            if *is_coliding_cave == true {
                 let opening = cave.openings[spaceship.position.x as usize];
-                if spaceship.position.y <= opening.0 {
+                if spaceship.position.y < opening.0 {
                     spaceship.position.y += 1;
                 } else {
                     spaceship.position.y -= 1;
                 }
             }
 
-            let color = if *is_coliding_cave {
-                Color::Red
-            } else {
-                Color::White
-            };
-            frame.render_widget(SpaceshipWidget::new(&spaceship, color), area);
-
-            let divider = 50.0;
+            let divider = area.right() as f64 - 11.0;
             let mut s = String::from("");
             let r: usize = (*energy as f64 / (100.0 / divider)).floor() as usize;
             let d = divider as usize - r;
 
             for _ in 0..r {
-                s.push_str("█");
+                s.push_str("▣");
             }
             for _ in 0..d {
-                s.push_str("░");
+                s.push_str("□");
             }
 
             frame.render_widget(
                 Block::default()
                     .title(format!("   {}   ", s))
                     .title_bottom("··· Scroll Speed: ← → ··· Quit: Esc / q ···")
+                    .title_style(Style::default().fg(color).bold())
                     .borders(Borders::ALL)
-                    .border_style(Style::default().fg(Color::White))
+                    .border_style(Style::default().fg(Color::Gray))
                     .border_type(BorderType::Rounded)
                     .style(Style::default().bg(Color::Black)),
                 area,
