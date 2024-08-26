@@ -1,7 +1,7 @@
 use ratatui::style::Color;
 use ratatui::widgets::Widget;
 
-use super::cave::Cave;
+use super::cave::CaveModel;
 
 pub struct Point {
     pub x: u16,
@@ -25,7 +25,7 @@ impl SpaceshipModel {
         }
     }
 
-    pub fn check_collision(&self, cave: &Cave) -> bool {
+    pub fn check_collision(&self, cave: &CaveModel) -> bool {
         let (top, bot) = cave.openings[self.position.x as usize];
 
         self.position.y < top || self.position.y > bot

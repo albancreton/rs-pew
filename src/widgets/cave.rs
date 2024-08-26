@@ -11,7 +11,7 @@ pub struct CaveConfig {
 }
 
 #[derive(Clone)]
-pub struct Cave {
+pub struct CaveModel {
     pub seed: f64,
     pub offset_x: i64,
     pub speed_x: i64,
@@ -25,7 +25,7 @@ pub struct Cave {
     pub openings: Vec<(u16, u16)>,
 }
 
-impl Cave {
+impl CaveModel {
     pub fn new(seed: f64, config: CaveConfig) -> Self {
         Self {
             seed,

@@ -4,7 +4,7 @@ use ratatui::style::{Color, Style};
 use ratatui::widgets::{Block, BorderType, Borders};
 use ratatui::Terminal;
 use rspew::renderer;
-use rspew::widgets::cave::{Cave, CaveConfig, CaveWidget};
+use rspew::widgets::cave::{CaveConfig, CaveModel, CaveWidget};
 use rspew::widgets::noise_background::NoiseBackground;
 use rspew::widgets::spaceship::{self, SpaceshipWidget};
 use std::io::{Result, Stdout};
@@ -19,7 +19,7 @@ fn main() -> Result<()> {
 
     let mut background = NoiseBackground::new(seed);
 
-    let mut cave = Cave::new(
+    let mut cave = CaveModel::new(
         100.0,
         CaveConfig {
             opening_max: 0.6,
@@ -29,7 +29,7 @@ fn main() -> Result<()> {
             color: Color::Rgb(220, 240, 244),
         },
     );
-    let mut cave_foreground = Cave::new(
+    let mut cave_foreground = CaveModel::new(
         200.0,
         CaveConfig {
             opening_max: 1.0,
@@ -57,8 +57,8 @@ fn gameloop(
     terminal: &mut Terminal<CrosstermBackend<Stdout>>,
     spaceship: &mut spaceship::SpaceshipModel,
     background: &mut NoiseBackground,
-    cave: &mut Cave,
-    cave_foreground: &mut Cave,
+    cave: &mut CaveModel,
+    cave_foreground: &mut CaveModel,
 ) -> Result<()> {
     let energy: &mut i32 = &mut 100;
     let is_coliding_cave: &mut bool = &mut false;
