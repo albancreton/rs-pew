@@ -73,11 +73,11 @@ fn gameloop(
             frame.render_widget(*background, area);
 
             cave.scroll(area);
-            frame.render_widget(CaveWidget::new(cave.color, &cave.pixels), area);
+            frame.render_widget(CaveWidget::new(cave.color, &cave.openings), area);
 
             cave_foreground.scroll(area);
             frame.render_widget(
-                CaveWidget::new(cave_foreground.color, &cave_foreground.pixels),
+                CaveWidget::new(cave_foreground.color, &cave_foreground.openings),
                 area,
             );
 

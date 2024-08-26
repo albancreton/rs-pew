@@ -26,7 +26,9 @@ impl SpaceshipModel {
     }
 
     pub fn check_collision(&self, cave: &Cave) -> bool {
-        cave.has_pixel(self.position.x, self.position.y)
+        let (top, bot) = cave.openings[self.position.x as usize];
+
+        self.position.y < top || self.position.y > bot
     }
 }
 

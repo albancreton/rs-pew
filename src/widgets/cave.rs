@@ -22,7 +22,6 @@ pub struct Cave {
     smooth: f64,
 
     pub color: Color,
-    pub pixels: Vec<(u16, u16)>,
     pub openings: Vec<(u16, u16)>,
 }
 
@@ -40,25 +39,19 @@ impl Cave {
             smooth: config.smooth,
 
             color: config.color,
-            pixels: vec![],
             openings: vec![],
         }
     }
     pub fn scroll(&mut self, area: Rect) {
         self.offset_x += self.speed_x;
-        self.calculate_pixels(area);
+        self.calculate_openings(area);
     }
 
     pub fn set_speed_x(&mut self, speed: i64) {
         self.speed_x = speed;
     }
 
-    pub fn has_pixel(&self, x: u16, y: u16) -> bool {
-        find(&(self.pixels), x, y)
-    }
-
-    fn calculate_pixels(&mut self, area: Rect) {
-        self.pixels = Vec::new();
+    fn calculate_openings(&mut self, area: Rect) {
         self.openings = Vec::new();
 
         let noise_base_x = area.x as f64 + self.offset_x as f64;
@@ -81,10 +74,6 @@ impl Cave {
             let center = area.height as f64 * noise_center;
             let opening = area.height as f64 * noise_opening;
 
-            let top = (center - (opening / 2.0)) as u16;
-            let bot = (center + (opening / 2.0)) as u16;
-            self.openings.push((top, bot));
-
             /*
             -
             | Solid
@@ -98,48 +87,31 @@ impl Cave {
             | Solid
             -
             */
-            for (_, y_pos) in (area.top()..area.bottom()).enumerate() {
-                if y_pos < top || y_pos > bot {
-                    self.pixels.push((x_pos, y_pos));
-                }
-            }
+            let top = (center - (opening / 2.0)) as u16;
+            let bot = (center + (opening / 2.0)) as u16;
+            self.openings.push((top, bot));
         }
     }
 }
 
 pub struct CaveWidget<'a> {
     color: Color,
-    pixels: &'a Vec<(u16, u16)>,
+    openings: &'a Vec<(u16, u16)>,
 }
 impl<'a> CaveWidget<'a> {
-    pub fn new(color: Color, pixels: &'a Vec<(u16, u16)>) -> Self {
-        Self { color, pixels }
+    pub fn new(color: Color, openings: &'a Vec<(u16, u16)>) -> Self {
+        Self { color, openings }
     }
 }
 impl Widget for CaveWidget<'_> {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        // for (x_pos, y_pos) in self.pixels.iter() {
-        //     let x: u16 = *x_pos;
-        //     let y: u16 = *y_pos;
-        //     if x < area.height - 1 && y < area.width - 1 {
-        //         buf.get_mut(x, y).set_char('█').set_fg(self.color);
-        //     }
-        // }
         for (_, y_pos) in (area.top()..area.bottom()).enumerate() {
             for (_, x_pos) in (area.left()..area.right()).enumerate() {
-                if find(self.pixels, x_pos, y_pos) {
+                let (top, bot) = self.openings[x_pos as usize];
+                if y_pos < top || y_pos > bot {
                     buf.get_mut(x_pos, y_pos).set_char('█').set_fg(self.color);
                 }
             }
         }
     }
-}
-
-fn find(v: &Vec<(u16, u16)>, x: u16, y: u16) -> bool {
-    for (x_pos, y_pos) in v.iter() {
-        if *x_pos == x && *y_pos == y {
-            return true;
-        }
-    }
-    return false;
 }
