@@ -7,9 +7,21 @@ use rspew::renderer;
 use rspew::widgets::cave::{CaveConfig, CaveModel, CaveWidget};
 use rspew::widgets::noise_background::NoiseBackground;
 use rspew::widgets::spaceship::{self, SpaceshipWidget};
+use std::env;
 use std::io::{Result, Stdout};
 
+fn detect_true_color() -> bool {
+    env::var("COLORTERM")
+        .map(|val| val == "truecolor" || val == "24bit")
+        .unwrap_or(false)
+}
+
 fn main() -> Result<()> {
+    if !detect_true_color() {
+        println!("You need a terminal that can render true colors to run this app.");
+        return Ok(());
+    }
+
     // init
     let renderer = renderer::Renderer::new();
     let mut terminal = renderer.start().unwrap();
